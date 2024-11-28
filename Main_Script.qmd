@@ -3,25 +3,13 @@ title: "Master Seminar Paper Intermediary Asset Pricing"
 author: "Janik Müller"
 format: html
 date: today
+toc: true
 ---
 
-## Quarto
+## Synopsis
+We will use this document to write our seminar paper. We will use the `quarto` package to write the paper in a literate programming style. This means that we will write the paper in a single document that includes both the content and the code used to generate the content. This will allow us to easily reproduce the results in the paper. Furthermore, we will submit a separate pdf file that only includes the text without the need to run the code. Moreover, we will use the `quarto` package to generate the pdf file where the code is hidden. 
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## Introduction
 
-## Running Code
+In this paper, we will investigate the intermediary asset pricing model proposed by Sa Mai (2023) where a semi parametric approach was used in to model the heterogenenous intermediary stochastic discount factor (HI-SDF)
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this 
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
