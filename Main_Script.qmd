@@ -11,5 +11,5 @@ We will use this document to write our seminar paper. We will use the `quarto` p
 
 ## Introduction
 
-In this paper, we will investigate the intermediary asset pricing model proposed by Sa Mai (2023) where a semi parametric approach was used in to model the heterogenenous intermediary stochastic discount factor (HI-SDF)
+In this paper, we will investigate the intermediary asset pricing model proposed by Sa Mai (2023) where a semi parametric approach was used in to model the heterogeneous intermediary stochastic discount factor (HI-SDF)
 
