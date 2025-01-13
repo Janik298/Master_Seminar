@@ -1,0 +1,170 @@
+\documentclass[12pt,a4paper]{article}
+
+
+
+\usepackage{multirow}
+\usepackage[normalem]{ulem}
+\useunder{\uline}{\ul}{}
+\usepackage{caption}
+
+\usepackage[T1]{fontenc} % Font encoding (e.g. hyphenation w/ accented characters)
+\usepackage[utf8]{inputenc} % utf-8 support
+\usepackage[english]{babel} % English as main language 
+\addto\captionsenglish{\renewcommand{\contentsname}{Table of Contents}} % after babel 
+\usepackage{kpfonts}
+
+\usepackage{graphicx} % graphics
+\graphicspath{{Graphics/}{../Graphics/}} % path to Graphics
+\usepackage[bookmarksdepth=3,pdfpagelayout=TwoPageRight,
+pdftoolbar=false,hyperfootnotes=false,
+pdfpagelabels=true]{hyperref}
+\usepackage{color} 
+\definecolor{utblue}{RGB}{10,90,200} % from color-package
+%\hypersetup{colorlinks=true,linkcolor=utblue,urlcolor=utblue}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
+\usepackage[margin=25mm]{geometry}
+\usepackage{longtable}
+%\linespread{1.5}
+\renewcommand{\baselinestretch}{1.3} % ~ 1.5 line spacing
+%\usepackage[parfill]{parskip} % space between parag. instead of indent
+\setlength{\parskip}{2pt} % "subtle" space between parag.
+%\usepackage{sectsty} % section formatting (section style)
+%\sectionfont{\LARGE} % font size of section
+%\subsectionfont{\Large} % font size of subsection
+%\subsubsectionfont{\large} % font size of subsubsection
+%\paragraphfont{\large} % font size of subsubsection
+%\setcounter{secnumdepth}{4}
+
+%% Penalties
+\widowpenalty=10000 % no single lines at the top of a page
+\clubpenalty=10000 % no single lines at the end of a page
+\displaywidowpenalty=10000 % \widowpenalty im "math mode"
+\interfootnotelinepenalty=10000 % footnotes always on one page
+% fine tuning: \looseness+1 or \looseness-1 before \par
+
+%% Math
+\usepackage{amsfonts,amsmath,amssymb,mathrsfs} % math. symbols
+\allowdisplaybreaks % subequations across more than one page
+%\usepackage{physics} % use of \pdv{}{} for partial derivatives % second partial derivative \pdv[n]{Q}{t}
+
+%% Footnotes
+\usepackage{setspace} % 1.5 line spacing not for footnotes
+\setlength{\footnotesep}{10pt} % some space between footnotes
+\usepackage[multiple,bottom]{footmisc} % footnotes always at bottom
+
+%% Citation
+
+\usepackage{natbib} % formatting citation and bibliography
+\renewcommand{\cite}{\citet} % [page] as option 
+%\hypersetup{citecolor=utblue}
+%\setcitestyle{notesep={, page }}
+
+%% Tables
+\usepackage{tabu} % tabu-environment, \tabulinesep
+\usepackage{booktabs} % horizontal lines in tables, usage with \toprule, \midrule, \bottomrule
+%\usepackage{float} % determining the position of e.g. tables
+\usepackage[font=small,labelfont=bf]{caption} % formatting of captions
+
+%% Misc
+\usepackage{subcaption} % for subfigure-environment
+\usepackage{bookmark} % corrects hyperlinks in pdf-file
+\usepackage{lipsum} % dummy text for template
+
+%% New commands
+\newcommand{\R}{{\mathbb R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\E}{\mathrm{E}}			
+\newcommand{\Lg}{\mathcal{L}} % lagrangian L
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Corr}{\mathrm{Corr}}
+
+\usepackage[capposition=top]{floatrow}
+
+%% Suggested/additional/optional packages
+%\usepackage{tocloft} % additional TOC options
+%\usepackage{etoc} % local TOCs
+%\usepackage{pdfpages} % \includepdf[pages={1-},scale=1]{*.pdf}
+%\usepackage{etoolbox} % tool to "patch" the commands
+%\usepackage{tikz} % simple graphics with TikZ
+%\usepackage{tikzscale} % scales on page width
+%\usepackage{filecontents} % imports TikZ as figures
+%\usepackage{svg} % vector graphics
+%\usepackage{longtable} % tables with page break
+%\usepackage{bookmark} % corrects hyperlinks in pdf-file
+%\usepackage[normalem]{ulem} % strikethrough and cancel out
+%\usepackage{microtype} % to get more compact text, reduces grey part
+%\usepackage{csquotes} % selects quotation marks automatically depending on the selected language
+%\usepackage[abbreviations,british]{foreign} % correct spacing for abbreviations, e.g. e.g.
+%\usepackage{lscape} % \begin{landscape} for a single or multiple horizontal pages
+	
+	
+	\begin{document}
+		\begin{titlepage}\label{sec:title}\newgeometry{margin=30mm}	
+			\begin{center}
+				{\huge \bfseries \hrulefill\\
+					Semi-parametric Estimation of a Heterogeneous Intermediaries SDF\\
+					\hrulefill}\\[4mm]
+				{\Large \bfseries
+					Seminar Paper\\[12mm]
+
+					Janik Müller}\\
+				Charlottenstraße 8\\
+				72070 Tübingen\\
+				Matrikel-Nr.: 6303477\\[10mm] 
+				{\large 
+					Eberhard Karls Universität Tübingen\\[2mm]
+					Supervisor: Prof. Dr. Joachim Grammig \\
+					M.Sc. Alexander Reining  \\[2mm]
+					Submission: \today}
+			\end{center}
+			\clearpage\thispagestyle{empty}\mbox{} % blank page
+		\end{titlepage}\restoregeometry	
+		
+		% --- start page numbering ---	
+		\tableofcontents
+		\clearpage
+		%
+		
+		
+		
+		
+		\clearpage
+		\thispagestyle{empty}\mbox{}
+		\clearpage
+		
+		
+		
+		% Sworn Declaration (end of document):
+		\newgeometry{margin=20mm}
+		
+		\section*{Ehrenwörtliche Erklärung}\label{sec:declaration}\thispagestyle{empty}
+		\begin{table}[H]{\tabulinesep=2mm
+				\begin{tabu}to \textwidth{@{}l X@{}} 
+					Name:& Janik Müller\\
+					Geburtstag:& 05 Februar 1998\\ 						% date of birth
+					Matrikelnummer:& 1444074\\ 								% student number
+					Studiengang:& B.Sc. Economics and Finance\\ 						% study program
+					Titel der besuchten Veranstaltung:& Bachelorarbeit\\ 	% module name
+					Titel der Arbeit:& Qualitative and Quantitative Analysis of the Survey of Professional Forecasters\\% thesis/report title
+			\end{tabu}}
+		\end{table}
+		%
+		Hiermit erkläre ich, dass die oben genannte Arbeit meine eigene ist und ich sie selbstständig verfasst habe. Des Weiteren bestätige ich folgendes:
+		\begin{itemize}
+			\item Ich habe diese Arbeit ohne fremde Hilfe verfasst;
+			\item ich habe alle Quellen (Bücher, Zeitschriftenartikel, Internetquellen, ...) in Übereinstimmung mit den Lehrstuhlanforderungen sowohl im Text als auch im Literaturverzeichnis gekennzeichnet;
+			\item alle Daten und Erkenntnisse in der Arbeit wurden weder gefälscht noch verschönert;
+			\item die vorliegende Arbeit habe ich bisher keinem anderen Prüfungsamt in gleicher oder vergleichbarer Form zum Erwerb eines Leistungsnachweises vorgelegt;
+			\item die vorliegende Arbeit wurde bisher nicht veröffentlicht.
+		\end{itemize}
+		Ich verstehe, dass jegliche falsche Angabe in der Arbeit disziplinarische universitäre Konsequenzen nach sich ziehen wird. Ich bin damit einverstanden, dass meine Arbeit elektronisch mit Hilfe einer Software zur Aufdeckung von Plagiaten überprüft wird. Ich bin auch damit einverstanden, dass meine Arbeit für zukünftige Überprüfungen gespeichert wird.
+		%
+		\vspace*{\fill}
+		\begin{table}[H]{\tabulinesep=10mm \Large \textbf{
+					\begin{tabu}to \textwidth{@{}l X@{}}
+						Datum: \hspace*{2cm} 20.05.2022 &  \\ 	% date
+						Unterschrift: & 	% signiture
+			\end{tabu}}}
+		\end{table}	
+	\end{document}	

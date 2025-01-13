@@ -12,3 +12,11 @@ library(lubridate) # For date-time manipulation
 library(ggplot2)   # For data visualization
 library(zoo)       # For time series data
 library(tidyverse) # For data manipulation and visualization
+library(rspell)    # For spell checking
+library(stats)     # For statistical functions
+library(plotly)    # For interactive plots
+library(splines)   # For spline functions
+library(gmm)       # For generalized method of moments
+library(scales)    # For scales and themes
+library(glmnet)    # For Lasso and Elastic Net regression
+library(MASS)      # For stepAIC function

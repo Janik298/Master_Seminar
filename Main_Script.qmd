@@ -6,10 +6,1555 @@ date: today
 toc: true
 ---
 
-## Synopsis
+# 0 Synopsis
 We will use this document to write our seminar paper. We will use the `quarto` package to write the paper in a literate programming style. This means that we will write the paper in a single document that includes both the content and the code used to generate the content. This will allow us to easily reproduce the results in the paper. Furthermore, we will submit a separate pdf file that only includes the text without the need to run the code. Moreover, we will use the `quarto` package to generate the pdf file where the code is hidden. 
 
-## Introduction
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+source("scripts/packages.R")
+source("scripts/functions.R")
+```
 
-In this paper, we will investigate the intermediary asset pricing model proposed by Sa Mai (2023) where a semi parametric approach was used in to model the heterogeneous intermediary stochastic discount factor (HI-SDF)
+
+# 1 Introduction
+
+In this paper, we will investigate the intermediary asset pricing model proposed by Sa Mai (2023) where a semi parametric approach was used in to model the heterogeneous intermediary stochastic discount factor (HI-SDF).
+
+# 2 Data
+
+First, let us check the data that we have available for our analysis. 
+
+
+## 2.1 Data Import
+
+```{r message=FALSE, eval=TRUE, output=FALSE}
+# Import all data files
+process_data_directory(data_dir = data_dir)
+```
+
+```{r echo = FALSE}
+# print(paste("Successfully Loaded:", ls()))
+```
+
+
+## 2.2 Data Cleaning
+
+### 2.2.1 Broker Dealer (BD) - Leverage Ratio
+
+For the broker dealers we are going to use the total financial assets and liabilities to calculate the leverage ratio.
+
+```{r warning=FALSE, message=FALSE}
+### Assets
+# Extract Total Assets and Total Liabilities and Equity for Broker Dealers
+total_assets_bd <- df_L.130 %>% filter(`Descriptions:` == "Security brokers and dealers; total financial assets")
+
+# Select the columns
+total_assets_bd <- total_assets_bd %>% 
+    dplyr::select(-"Descriptions:", -"Unit:", -"Currency:", -"Unique Identifier:", -"Series Name:", -"Multiplier:")
+
+# Replace ND with NA
+total_assets_bd <- total_assets_bd %>% 
+    mutate(across(everything(),
+                  ~ as.numeric(.)
+                  )
+           )
+
+# Total Assets into long format
+total_assets_bd_long <- total_assets_bd %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    ) %>% 
+    filter(Quarter >= "1970 Q1")
+
+
+### Liabilities
+
+# Extract Total Liabilities and Equity for Broker Dealers
+total_liabilities_bd <- df_L.130 %>% filter(`Descriptions:` == "Security brokers and dealers; total liabilities")
+
+# Select the columns
+total_liabilities_bd <- total_liabilities_bd %>% 
+    dplyr::select(-"Descriptions:", -"Unit:", -"Currency:", -"Unique Identifier:", -"Series Name:", -"Multiplier:")
+
+# Replace ND with NA
+total_liabilities_bd <- total_liabilities_bd %>% 
+    mutate(across(everything(),
+                  ~ as.numeric(.)
+                  )
+           )
+
+
+
+# Total Liabilities into long format
+total_liabilities_bd_long <- total_liabilities_bd %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    ) %>% 
+    filter(Quarter >= "1970 Q1")
+
+
+# Calculate the leverage ratio
+leverage_ratio_bd <- total_assets_bd / (total_assets_bd - total_liabilities_bd)
+
+rm(df_L.130)
+```
+
+<br>
+
+Plot of the Log-Leverage of Broker Dealers:
+
+```{r, echo=FALSE}
+# Bring into the Long format
+leverage_ratio_bd_long <- leverage_ratio_bd %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    )
+leverage_ratio_bd_long <- leverage_ratio_bd_long %>% 
+    mutate(Quarter = as.yearqtr(Quarter, format = "%YQ%q")) %>%
+    filter(Quarter >= "1970 Q1")
+
+
+
+# Plot of Broker Dealers Log-Leverage Ratio
+leverage_ratio_bd_long %>% 
+    ggplot(aes(x = Quarter, y = log(Value))) +
+    geom_line() +
+    labs(title = "Log-Leverage Ratio of Broker Dealers",
+         x = "Quarter",
+         y = "Log-Leverage Ratio") +
+    theme_minimal()
+```
+
+
+
+
+
+
+### 2.2.2 Bank Holding Company (BHC) - Leverage Ratio
+
+For the bank holding companies we are going to use the total financial assets and liabilities to calculate the leverage ratio. 
+
+```{r warning=FALSE, message=FALSE}
+# Extract Total Assets and Total Liabilities and Equity for Bank Holding Companies
+total_assets_bhc <- df_L.131 %>% filter(`Descriptions:` == "Holding companies; total financial assets")
+
+# Select the columns
+total_assets_bhc <- total_assets_bhc %>% 
+    dplyr::select(-"Descriptions:", -"Unit:", -"Currency:", -"Unique Identifier:", -"Series Name:", -"Multiplier:")
+
+# Replace ND with NA
+total_assets_bhc <- total_assets_bhc %>% 
+    mutate(across(everything(),
+                  ~ as.numeric(.)
+                  )
+           )
+
+
+# Extract Total Liabilities and Equity for Bank Holding Companies
+total_liabilities_bhc <- df_L.131 %>% filter(`Descriptions:` == "Holding companies; total liabilities")
+
+# Select the columns
+total_liabilities_bhc <- total_liabilities_bhc %>% 
+    dplyr::select(-"Descriptions:", -"Unit:", -"Currency:", -"Unique Identifier:", -"Series Name:", -"Multiplier:")
+
+# Replace ND with NA
+total_liabilities_bhc <- total_liabilities_bhc %>% 
+    mutate(across(everything(),
+                  ~ as.numeric(.)
+                  )
+           )
+
+
+
+
+
+# Calculate the leverage ratio
+leverage_ratio_bhc <- total_assets_bhc / (total_assets_bhc - total_liabilities_bhc)
+
+rm(df_L.131)
+```
+
+
+
+
+<br>
+
+Plot of the Log-Leverage of Bank Holding Companies:
+
+```{r, echo=FALSE}
+# Bring into the Long format
+leverage_ratio_bhc_long <- leverage_ratio_bhc %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    )
+
+leverage_ratio_bhc_long <- leverage_ratio_bhc_long %>%
+    mutate(Quarter = as.yearqtr(Quarter, format = "%YQ%q")) %>%
+    filter(Quarter >= "1970 Q1")
+
+# Plot of Bank Holding Companies Log-Leverage Ratio
+leverage_ratio_bhc_long %>% 
+    ggplot(aes(x = Quarter, y = log(Value))) +
+    geom_line() +
+    labs(title = "Log-Leverage Ratio of Bank Holding Companies",
+         x = "Quarter",
+         y = "Log-Leverage Ratio") +
+    theme_minimal()
+```
+
+<br>
+
+
+### 2.2.3 Aggregate Leverage Ratio
+
+We will calculate the aggregate leverage ratio for the broker dealers and bank holding companies. 
+Defined as total assets BD and BHC over total equity.
+
+```{r warning=FALSE, message=FALSE}
+# Calculate the aggregate leverage ratio
+aggregate_leverage <- (total_assets_bd + total_assets_bhc) / (total_assets_bd + total_assets_bhc - total_liabilities_bd - total_liabilities_bhc)
+```
+
+<br>
+
+Plot the aggregate Leverage Ratio:
+
+```{r, echo=FALSE}
+# Bring into the Long format
+aggregate_leverage_long <- aggregate_leverage %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    )
+
+aggregate_leverage_long <- aggregate_leverage_long %>%
+    mutate(Quarter = as.yearqtr(Quarter, format = "%YQ%q")) %>%
+    mutate(Quarter = Quarter - 0.25) %>%
+    filter(Quarter >= "1970 Q1")
+
+# Plot of Aggregate Leverage Ratio
+aggregate_leverage_long %>% 
+    ggplot(aes(x = Quarter, y = log(Value))) +
+    geom_line() +
+    labs(title = "Log-Aggregate Leverage Ratio of Broker Dealers and Bank Holding Companies",
+         x = "Quarter",
+         y = "Log-Aggregate Leverage Ratio") +
+    theme_minimal()
+```
+
+
+### 2.2.4 Net Worth Share Calculation
+
+We will calculate the net worth share for the broker dealers and bank holding companies. 
+
+```{r warning=FALSE, message=FALSE}
+# Calculate the Net Worth Share
+net_worth_share <- (total_assets_bhc - total_liabilities_bhc) / ((total_assets_bhc + total_assets_bd) - (total_liabilities_bhc + total_liabilities_bd))
+```
+
+Plot of the net worth share:
+
+```{r, echo=FALSE}
+# Bring into the Long format
+
+net_worth_share_long <- net_worth_share %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    )
+
+net_worth_share_long <- net_worth_share_long %>%
+    mutate(Quarter = as.yearqtr(Quarter, format = "%YQ%q")) %>%
+    mutate(Quarter = Quarter - 0.25) %>%
+    filter(Quarter >= "1970 Q1")
+
+# Plot of Net Worth Share
+net_worth_share_long %>% 
+    ggplot(aes(x = Quarter, y = Value)) +
+    geom_line() +
+    labs(title = "Net Worth Share of Broker Dealers and Bank Holding Companies",
+         x = "Quarter",
+         y = "Net Worth Share") +
+    theme_minimal()
+```
+
+
+
+
+
+
+#### PLots for the seminar paper
+
+Here we will make plots of log leverage together for bd and bhc.
+
+```{r}
+# Merge the dataframes
+leverage_ratio_full_table <- leverage_ratio_bd_long %>% 
+    inner_join(leverage_ratio_bhc_long, by = c("Quarter")) %>%
+    rename(bd = Value.x, bhc = Value.y) %>% 
+    mutate(bd = log(bd) , bhc = log(bhc)) 
+
+leverage_ratio_plot <- leverage_ratio_full_table %>%
+    mutate(Institution = ifelse(Institution == "bd", "Broker Dealers", "Bank Holding Companies")) %>%
+    pivot_longer(
+        cols = c(bd, bhc),
+        names_to = "Institution",
+        values_to = "Value"
+    ) 
+
+# Plot the data
+
+
+leverage_ratio_plot %>% 
+    ggplot(aes(x = Quarter, y = Value, color = Institution)) +
+    geom_line() +
+    # Put the values on different axes to make them better comparable
+    facet_wrap(~Institution, scales = "free_y") +
+    labs(title = "Log-Leverage Ratio of Broker Dealers and Bank Holding Companies",
+         x = "Quarter",
+         y = "Log-Leverage Ratio") +
+    theme_bw() +
+    theme(legend.position = "", 
+          axis.text.x = element_text(angle = 45, hjust = 1), 
+           plot.title = element_text(hjust = 0.5, face = "bold"))
+
+df_GDP <- df_GDP %>% 
+    mutate(Quarter = as.yearqtr(observation_date, format = "%Y-%m-%d")) %>%
+    dplyr::select(-DATE, GDP = GDP) %>% 
+    filter(Quarter >= "1970 Q4")
+
+
+# Calculate the correlation between innovation of GDP and Residual of an AR(1) process between levergage and GDP
+leverage_ratio_full_table <- df_GDP%>% 
+    inner_join(leverage_ratio_full_table) 
+
+# Calcualte ar1
+ar1_bd <- arima(leverage_ratio_full_table$bd, order = c(1,0,0))
+ar1_bhc <- arima(leverage_ratio_full_table$bhc, order = c(1,0,0))
+
+# Calculate the residuals
+residuals_bd <- residuals(ar1_bd)
+residuals_bhc <- residuals(ar1_bhc)
+
+leverage_ratio_full_table <- leverage_ratio_full_table %>% 
+    mutate(residuals_bd = residuals_bd, residuals_bhc = residuals_bhc)
+
+
+# Calculate the correlation
+correlation_bd_bhc <- cor(leverage_ratio_full_table$residuals_bd, leverage_ratio_full_table$residuals_bhc)
+
+# Calculate the innovation of gdp
+leverage_ratio_full_table <- leverage_ratio_full_table %>% 
+    mutate(GDP_innovation = lead(GDP) / GDP) %>%
+    slice(1:n()-1, )
+
+correlation_bd_gdp <- cor(leverage_ratio_full_table$residuals_bd, leverage_ratio_full_table$GDP_innovation)
+correlation_bhc_gdp <- cor(leverage_ratio_full_table$residuals_bhc, leverage_ratio_full_table$GDP_innovation)
+
+```
+
+
+
+
+
+```{r}
+
+networth_share_full_table <- net_worth_share_long %>% 
+    inner_join(aggregate_leverage_long, by = c("Quarter")) %>%
+    rename("Net Worth Share" = Value.x, "Aggregate Leverage" = Value.y)
+
+networth_share_full_table_long <- networth_share_full_table %>% 
+    pivot_longer(
+        cols = c("Net Worth Share", "Aggregate Leverage"),
+        names_to = "Institution",
+        values_to = "Value"
+    )
+
+
+# Plot the data
+networth_share_full_table_long %>% 
+    ggplot(aes(x = Quarter, y = Value, color = Institution)) +
+    geom_line() +
+    # Put the values on different axes to make them better comparable
+    facet_wrap(~Institution, scales = "free_y") +
+    labs(title = "Net Worth Share and Aggregate Leverage Ratio of Broker Dealers and Bank Holding Companies",
+         x = "Quarter",
+         y = "Value") +
+    theme_bw() +
+    theme(legend.position = "", 
+          axis.text.x = element_text(angle = 45, hjust = 1), 
+           plot.title = element_text(hjust = 0.5, face = "bold"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 2.2.5 Personal Expenditure - Consumption Growth
+
+We will calculate the consumption growth rate for the personal expenditure data. 
+
+```{r}
+# Calculate the consumption growth rate
+df_pce_growth <- df_PCECC96 %>% 
+    mutate(Quarter = as.yearqtr(DATE, format = "%Y-%m-%d")) %>%
+    dplyr::select(-DATE, PCE = PCECC96) %>% 
+    mutate(pce_growth = lead(PCE) / PCE) %>% 
+    filter(Quarter >= "1970 Q4") %>%
+    filter(row_number() != n())
+```
+
+
+Now we will plot the consumption growth rate:
+
+```{r, echo=FALSE}
+# Plot of Consumption Growth Rate
+df_pce_growth %>% 
+    ggplot(aes(x = Quarter, y = pce_growth)) +
+    geom_line() +
+    labs(title = "Personal Consumption Expenditure Growth Rate",
+         x = "Quarter",
+         y = "Growth Rate") +
+    theme_minimal()
+```
+
+
+### 2.2.6 Historical Return Data
+
+We will calculate the historical return data for equity, non-equity, risk-free (i.e. treasury bill), commodities, CDS, options and FX data, as well as a combined portfolio. 
+
+
+#### 1 Equity Portfolios
+
+```{r}
+## Equity Portfolios
+
+# List the Dataframes
+list_of_dataframes <- c(
+    "df_10_Portfolios_Prior_60_13",
+    "df_25_Portfolios_5x5",
+    "df_25_Portfolios_ME_INV_5x5",
+    "df_25_Portfolios_ME_OP_5x5"
+)
+
+
+
+
+# Change dataframes to date format
+for (dataframe_name in list_of_dataframes) {
+    # Retrieve the dataframe by name
+    dataframe <- get(dataframe_name)
+    # Apply the function
+    modified_dataframe <- change_to_date(dataframe)
+    # Assign the modified dataframe back to its original name
+    assign(dataframe_name, modified_dataframe)
+    # Remove the modified dataframe from the environment
+    rm(modified_dataframe)
+}
+
+
+# Merge dataframes in the list of dataframes on date column
+df_equity_monthly <- df_10_Portfolios_Prior_60_13 %>% 
+    inner_join(df_25_Portfolios_5x5, by = "date") %>% 
+    inner_join(df_25_Portfolios_ME_INV_5x5, by = "date") %>% 
+    inner_join(df_25_Portfolios_ME_OP_5x5, by = "date")
+
+# Make Returns decimal number
+df_equity_monthly <- df_equity_monthly %>% 
+    mutate(across(-date, ~ . / 100))
+
+# Turn monthly returns into quarterly gross returns
+df_equity_monthly <- df_equity_monthly %>% 
+    mutate(Quarter = as.yearqtr(date, format = "%Y-%m-%d")) %>% 
+    group_by(Quarter) %>%
+    summarise(across(-date, ~ prod(1 + .)))
+
+# Put into long Format with asset_id and asset_class
+df_equity_monthly_long <- df_equity_monthly %>%
+    pivot_longer(
+        cols = -Quarter,
+        names_to = "portfolio_id",
+        values_to = "returns"
+    )
+
+# Include equity asset class
+df_equity_monthly_long <- df_equity_monthly_long %>% 
+    mutate(asset_class = "equity")
+
+
+# Include specific asset_id
+df_equity <- df_equity_monthly_long %>%
+  mutate(asset_id = case_when(
+    grepl("^Lo PRIOR|^PRIOR [2-9]$", portfolio_id) ~ "long_run_reversals",
+    grepl("^Hi PRIOR$", portfolio_id) ~ "long_run_reversals",
+    grepl("^SMALL LoBM|^ME[1-5] BM[1-5]|^BIG LoBM$", portfolio_id) ~ "size_bm",
+    grepl("^SMALL HiBM|^BIG HiBM$", portfolio_id) ~ "size_bm",
+    grepl("^SMALL LoINV|^ME[1-5] INV[1-5]|^BIG LoINV$", portfolio_id) ~ "size_inv",
+    grepl("^SMALL HiINV|^BIG HiINV$", portfolio_id) ~ "size_inv",
+    grepl("^SMALL LoOP|^ME[1-5] OP[1-5]|^BIG LoOP$", portfolio_id) ~ "size_op",
+    grepl("^SMALL HiOP|^BIG HiOP$", portfolio_id) ~ "size_op",
+    TRUE ~ "unknown"  # Default category if no match is found
+  ))
+
+# Make returns to t+1 returns
+df_equity <- df_equity %>% mutate(Quarter = Quarter - 0.25)
+
+# Remove unnecessary dataframes
+rm(list_of_dataframes)
+rm(df_10_Portfolios_Prior_60_13)
+rm(df_25_Portfolios_5x5)
+rm(df_25_Portfolios_ME_INV_5x5)
+rm(df_25_Portfolios_ME_OP_5x5)
+rm(dataframe)
+```
+
+
+#### 2 Non-Equity Portfolios
+
+Here we will clean in the He, Kelly and Manela data for non-equity portfolios. 
+
+
+```{r}
+# Subset non-equity data
+non_equity_HKM <- df_He_Kelly_Manela_Factors_And_Test_Assets[, c(1, 37:ncol(df_He_Kelly_Manela_Factors_And_Test_Assets))]
+
+# Make first column to yearqtr
+non_equity_HKM <- non_equity_HKM %>%
+    mutate(yyyyq = as.yearqtr(as.character(yyyyq), format = "%Y%q")) %>% 
+    rename(Quarter = yyyyq)
+
+
+# Make the Returns to gross returns
+non_equity_HKM <- non_equity_HKM %>% 
+    mutate(across(-Quarter, ~ . + 1))
+
+# Add asset class
+non_equity_HKM <- non_equity_HKM %>% 
+    pivot_longer(
+        cols = -Quarter,
+        names_to = "portfolio_id",
+        values_to = "returns"
+    ) %>% 
+    mutate(asset_class = "non_equity")
+
+# Add asset_id
+non_equity_HKM <- non_equity_HKM %>%
+  mutate(asset_id = case_when(
+    grepl("^US_bonds_", portfolio_id) ~ "government_bonds",
+    grepl("^Sov_bonds_", portfolio_id) ~ "sovereign_bonds",
+    grepl("^Options_", portfolio_id) ~ "options",
+    grepl("^CDS_", portfolio_id) ~ "credit_default_swaps",
+    grepl("^Commod_", portfolio_id) ~ "commodities",
+    grepl("^FX_", portfolio_id) ~ "foreign_exchange",
+    grepl("^All_", portfolio_id) ~ "all",
+    TRUE ~ "unknown"  # Default category if no match is found
+  ))
+
+
+# Remove all assets called "all"
+non_equity_HKM <- non_equity_HKM %>% 
+    filter(asset_id != "all") %>%
+    mutate(Quarter = Quarter - 0.25)
+```
+
+
+
+#### 3 Risk-Free Rate
+
+```{r}
+# Extract the risk-free rate
+r_f <- df_TB3MS
+#rm(df_TB3MS)
+
+# Change date to yearqtr
+r_f <- r_f %>% 
+    mutate(Quarter = as.yearqtr(observation_date, format = "%Y-%m-%d")) %>% 
+    dplyr::select(-observation_date) %>%
+    rename(returns = TB3MS)
+
+# Divide the rf by 100 to get the decimal number
+r_f <- r_f %>% 
+    mutate(returns = returns / 100)
+
+# Calculate Quarterly r_f
+r_f <- r_f %>% 
+    group_by(Quarter) %>%
+    summarise(returns = prod(1 + returns))
+
+
+# Add asset class
+r_f <- r_f %>% 
+    mutate(asset_class = "risk_free_rate", asset_id = "risk_free_rate") %>%
+    mutate(Quarter = Quarter - 0.25)
+```
+
+
+#### 4 Instruments
+
+##### 1 CAY
+
+```{r}
+# Change date to yearqtr
+df_cay_current <- df_cay_current %>% 
+    mutate(Quarter = as.yearqtr(date, format = "%Y-%m-%d")) %>% 
+    dplyr::select(-date) %>%
+    rename(cay_t = `cay=c-0.218 a-0.801y+0.441`)
+
+```
+
+
+1. Wealth
+
+
+```{r}
+
+# Add the necessary data till 2024
+
+start_year_qtr <- as.Date("2019-12-01")
+end_year_qtr <- as.Date("2024-09-01")    
+yq <- seq(as.yearqtr(start_year_qtr), as.yearqtr(end_year_qtr), by = 1/4)
+
+
+# Wealth data
+
+# Remove unnecessary columns
+df_wealth <- df_wealth[c(1,20), -c(1:6)]
+
+# Calculate net wealth of households
+df_wealth_net <- df_wealth[1, ] - df_wealth[2, ]
+
+# Wealth data into long format
+df_wealth_net_long <- df_wealth_net %>%
+    pivot_longer(
+        cols = everything(),
+        names_to = "Quarter",
+        values_to = "Value"
+    )
+
+# Change wealth into log scale
+df_wealth_net_long <- df_wealth_net_long %>% 
+    mutate(Value = log(Value))
+
+# Calculate growth rate of df_wealth_net_long
+df_wealth_growth <- df_wealth_net_long %>% 
+    mutate(Quarter = as.yearqtr(Quarter, format = "%YQ%q")) %>% 
+    mutate(wealth_growth = log(Value / df_wealth_net_long$Value[3])) %>%
+    slice(4:n())
+
+# Use growth rate to calculate the wealth growth until 2024
+growth_rate_wealth <-  df_wealth_growth$wealth_growth
+additional_wealth <- df_cay_current$w[nrow(df_cay_current)] * exp(growth_rate_wealth)
+
+
+
+# Add the additional wealth to the cay data
+df_cay_current <- df_cay_current %>% 
+    add_row(Quarter = yq, 
+            w = additional_wealth)
+
+```
+
+
+
+2. Labor Income
+
+```{r}
+# Labor Income
+
+
+df_labor_income <- df_labor_income[2, -c(1:2)]
+
+# Bring into long format
+df_labor_income_long <- df_labor_income %>%
+  pivot_longer(
+    cols = everything(),  
+    names_to = "Year",  
+    values_to = "Value"
+  ) %>% 
+    mutate(Year = as.numeric(Year))
+
+
+# Intrapolate the labor income data to quarterly data
+df_labor_income_long <- df_labor_income_long %>%
+  complete(
+    Year = seq(min(Year) , max(Year) + 0.75, by = 0.25)
+  ) %>%
+  mutate(
+    Quarter = as.yearqtr(Year),
+  ) %>%
+  arrange(Quarter) %>%
+    mutate(Value = lag(Value, n = 3)) %>% 
+    slice(-c(1:3))
+
+# Interpolate values for missing quarters
+df_labor_income_long$Value <- zoo::na.approx(df_labor_income_long$Value)
+
+# Use mean growth rate of the Quarters in the dataset to approx the quarters to Q3 2024
+df_labor_income_long <- df_labor_income_long %>% 
+    mutate(labor_growth = log(Value / lag(df_labor_income_long$Value))) 
+
+mean_growth_rate_labor <- mean(df_labor_income_long$labor_growth, na.rm = TRUE)
+
+# Extrapolate the data up to 2024 Q3
+value_2024_Q1 <- df_labor_income_long$Value[nrow(df_labor_income_long)] * exp(mean_growth_rate_labor)
+value_2024_Q2 <- value_2024_Q1 * exp(mean_growth_rate_labor)
+value_2024_Q3 <- value_2024_Q2 * exp(mean_growth_rate_labor)
+
+# Add these values to the dataframe
+df_labor_income_long <- df_labor_income_long %>% 
+    add_row(Quarter = as.yearqtr("2024 Q1", format = "%Y Q%q"), Value = value_2024_Q1) %>% 
+    add_row(Quarter = as.yearqtr("2024 Q2", format = "%Y Q%q"), Value = value_2024_Q2) %>% 
+    add_row(Quarter = as.yearqtr("2024 Q3", format = "%Y Q%q"), Value = value_2024_Q3)
+
+
+# Remove unnessary columns
+df_labor_income_long <- df_labor_income_long %>% 
+    dplyr::select(-Year, -labor_growth)
+
+
+# Remove all rows prior to 2019 Q4 in labor income
+df_labor_income_long <- df_labor_income_long %>% 
+    filter(Quarter >= "2019 Q3")
+
+# Make to log scale
+df_labor_income_long <- df_labor_income_long %>% 
+    mutate(Value = log(Value))
+
+# Calculate growth rate for labor_income to the quarter 2019 Q3
+df_labor_income_long <- df_labor_income_long %>% 
+    mutate(labor_growth = log(Value / df_labor_income_long$Value[1])) %>% 
+    slice(2:n())
+
+# Use growth rate to calculate the labor income growth until 2024
+growth_rate_labor <-  df_labor_income_long$labor_growth
+additional_labor_income <- df_cay_current$y[271] * exp(growth_rate_labor)
+
+# Add the data to the cay_current dataframe
+df_cay_current[is.na(df_cay_current$y), "y"] <- additional_labor_income 
+
+
+```
+
+
+3. Consumption
+
+
+```{r}
+
+# Consumption data
+consumption_growth_labor <- df_pce_growth %>% 
+    filter(Quarter >= "2019 Q3")
+
+# Make to log scale
+consumption_growth_labor <- consumption_growth_labor %>% 
+    mutate(pce_growth = log(PCE))
+
+# Calculate the growth of the pce from the base of 2019 Q3
+consumption_growth_labor <- consumption_growth_labor %>% 
+    mutate(pce_growth = log(PCE / consumption_growth_labor$PCE[1])) %>% 
+    slice(2:n())
+
+
+# Use growth rate to calculate the consumption growth until 2024
+growth_rate_consumption <-  consumption_growth_labor$pce_growth
+additional_consumption <- df_cay_current$c[271] * exp(growth_rate_consumption)
+
+# Add the data to the cay_current dataframe
+df_cay_current <- df_cay_current[-nrow(df_cay_current), ]
+df_cay_current[is.na(df_cay_current$c), "c"] <- additional_consumption
+
+
+# Calculate the cay_tfor the missing time frame
+additional_cay_t <- df_cay_current %>% 
+    filter(is.na(cay_t)) %>%
+    mutate(cay_t = c - 0.218 * w - 0.801 * y + 0.441) %>%
+    dplyr::select(-w, -y, -c)
+
+# Add the data to the cay_current dataframe
+df_cay_current[is.na(df_cay_current$cay_t), "cay_t"] <- additional_cay_t$cay_t
+```
+
+
+
+##### 2 RREL
+
+```{r}
+# Relative T-Bill Rate
+
+# Make the monthly data into quarterly data
+df_TB3MS <- df_TB3MS %>% 
+    mutate(observation_date = as.Date(observation_date)) %>% 
+    group_by(Year = year(observation_date), Quarter = quarter(observation_date)) %>% 
+    summarise(TB3MS = mean(TB3MS)) %>% 
+    ungroup() %>% 
+    mutate(Quarter = paste(Year, "Q", Quarter, sep = "")) %>% 
+    dplyr::select(-Year)
+
+
+# Add quarters
+df_TB3MS <- df_TB3MS %>% 
+    mutate(Quarter = as.yearqtr(Quarter, format = "%YQ%q")) %>% 
+    rename("T_Bill_Rate" = TB3MS) %>%
+    mutate(T_Bill_Rate = T_Bill_Rate / 100)
+
+
+# Rolling t-bill
+rrel <- df_TB3MS %>%
+    arrange(Quarter) %>%
+  mutate(
+    T_Bill_MA = rollapply(T_Bill_Rate, width = 12, mean, align = "right", fill = NA), # 12-month MA
+    RREL_t = T_Bill_Rate - T_Bill_MA  # Calculate RREL_t
+  ) %>% 
+    dplyr::select(-T_Bill_MA) %>% 
+    filter(Quarter >= "1970 Q1") %>%
+    mutate(T_Bill_Rate = T_Bill_Rate + 1)
+```
+
+##### 3 Consumption Growth
+
+```{r}
+# Consumption growth
+consumption_growth <- df_PCECC96 %>% 
+    mutate(Quarter = as.yearqtr(DATE, format = "%Y-%m-%d")) %>%
+    dplyr::select(-DATE, PCE = PCECC96) %>% 
+    filter(Quarter >= "1969 Q4") %>% 
+    mutate(pce_growth = PCE / lag(PCE)) %>% 
+    filter(row_number() != 1)
+
+
+```
+
+
+
+#### 5 Combine Data in different ways for the analysis 
+
+1. All Assets
+
+```{r}
+# All assets
+
+# Full join all Data together
+df_all_assets <- bind_rows(df_equity, non_equity_HKM, r_f) %>%
+    # Filter all data from 1969 Q4
+    filter(Quarter >= "1969 Q4")
+
+# Inner_join the Net worth share and aggregate leverage
+df_all_assets <- df_all_assets %>% 
+    inner_join(net_worth_share_long, by = "Quarter") %>% 
+    rename(psi_t = Value) %>%
+    inner_join(aggregate_leverage_long, by = "Quarter") %>%
+    rename(phi_t = Value) %>%
+    inner_join(df_cay_current, by = "Quarter") %>%
+    dplyr::select(-"c", -"w", -"y") %>%
+    inner_join(rrel, by = "Quarter") %>%
+    inner_join(df_pce_growth, by = "Quarter") %>%
+    dplyr::select(-"PCE", "consumption_growth" = "pce_growth") %>%
+    # Add a column with average excess returns over T-Bill Rate
+    mutate(avg_excess_return = returns - T_Bill_Rate)
+
+
+
+# Check for NA in the all assets dataframe
+print(paste("Number of NA in the all assets dataframe:", sum(is.na(df_all_assets))))
+
+# Remove all rows that contain NA's it does not matter where those NA's are.
+df_all_assets <- df_all_assets %>% 
+    drop_na()
+
+
+
+
+# write_csv(df_all_assets, "cleaned_data/df_all_assets.csv")
+```
+
+
+
+2. Equity
+
+```{r}
+# Equity only
+
+# Full join all Data together
+df_equity <- bind_rows(df_equity) %>%
+    # Filter all data from 1970 Q1
+    filter(Quarter >= "1971 Q1") %>% 
+    filter(Quarter <= "2019 Q4")
+
+# Inner_join the Net worth share and aggregate leverage
+df_equity <- df_equity %>% 
+    inner_join(net_worth_share_long, by = "Quarter") %>% 
+    rename(psi_t = Value) %>%
+    inner_join(aggregate_leverage_long, by = "Quarter") %>%
+    rename(phi_t = Value) %>%
+    inner_join(df_cay_current, by = "Quarter") %>%
+    dplyr::select(-"c", -"w", -"y") %>%
+    inner_join(rrel, by = "Quarter") %>%
+    inner_join(df_pce_growth, by = "Quarter") %>%
+    dplyr::select(-"PCE", "consumption_growth" = "pce_growth") %>%
+    # Add a column with average excess returns over T-Bill Rate
+    mutate(avg_excess_return = returns - T_Bill_Rate)
+
+
+# Check for NA in the all assets dataframe
+print(paste("Number of NA in the equity dataframe:", sum(is.na(df_equity))))
+```
+
+
+
+3. Non-Equity
+
+```{r}
+
+# Non-Equity only
+
+# Inner_join the Net worth share and aggregate leverage
+df_non_equity <- non_equity_HKM %>% 
+    inner_join(net_worth_share_long, by = "Quarter") %>% 
+    rename(psi_t = Value) %>%
+    inner_join(aggregate_leverage_long, by = "Quarter") %>%
+    rename(phi_t = Value) %>%
+    inner_join(df_cay_current, by = "Quarter") %>%
+    dplyr::select(-"c", -"w", -"y") %>%
+    inner_join(rrel, by = "Quarter") %>%
+    inner_join(df_pce_growth, by = "Quarter") %>%
+    dplyr::select(-"PCE", "consumption_growth" = "pce_growth") %>%
+    # Add a column with average excess returns over T-Bill Rate
+    mutate(avg_excess_return = returns - T_Bill_Rate)
+
+
+# Check for NA in the all assets dataframe
+print(paste("Number of NA in the non-equity dataframe:", sum(is.na(df_non_equity))))
+```
+
+--------------
+
+
+
+
+
+
+#### 6 Remove some varibales from the envirnonment
+
+```{r}
+rm(df_equity_monthly)
+rm(df_equity_monthly_long)
+rm(additional_cay_t)
+rm(aggregate_leverage)
+rm(df_compensation_of_employees)
+rm(df_contr_social_gov)
+rm(df_cpi)
+rm(df_He_Kelly_Manela_Factors_And_Test_Assets)
+rm(df_labor_income)
+rm(df_labor_income_long)
+rm(df_personal_income_other)
+rm(df_personal_current_transfer)
+rm(df_personal_current_taxes)
+rm(aggregate_leverage_long)
+rm(consumption_growth_labor)
+rm(df_cay_current)
+rm(df_pce_growth)
+rm(df_PCECC96)
+rm(df_wealth)
+rm(df_wealth_growth)
+rm(df_wealth_net)
+rm(df_wealth_net_long)
+rm(leverage_ratio_bd)
+rm(leverage_ratio_bd_long)
+rm(leverage_ratio_bhc)
+rm(leverage_ratio_bhc_long)
+rm(net_worth_share)
+rm(net_worth_share_long)
+rm(rrel)
+rm(total_assets_bd)
+rm(total_assets_bd_long)
+rm(total_assets_bhc)
+rm(total_liabilities_bd)
+rm(total_liabilities_bd_long)
+rm(total_liabilities_bhc)
+rm(value_2024_Q1)
+rm(value_2024_Q2)
+rm(value_2024_Q3)
+rm(yq)
+rm(start_year_qtr)
+rm(list_of_files)
+rm(additional_wealth)
+rm(additional_labor_income)
+rm(additional_consumption)
+rm(dataframe_name)
+rm(end_year_qtr)
+rm(growth_rate_consumption)
+rm(growth_rate_labor)
+rm(mean_growth_rate_labor)
+rm(growth_rate_wealth)
+rm(non_equity_HKM)
+
+consumption_growth_instrument <- consumption_growth
+rm(consumption_growth)
+```
+
+
+
+------------
+
+<br>
+
+
+
+
+# 3 Estimation of the HI-SDF Model
+
+In this section, we will estimate the HI-SDF model proposed by Sa Mai (2023). 
+
+First we will define the moment conditions and the sieve estimation of the conditional mean M(w_t).
+
+Step 0: Simulate the data
+
+```{r}
+
+```
+
+
+
+
+Step 1: Load data
+
+```{r}
+# Step 1: Estimate \omega Using Sieve Minimum Distance (SMD)
+
+data <- df_equity
+
+
+# Assign variables
+psi <- data$psi_t
+phi <- data$phi_t
+returns <- data$returns # Example: asset returns
+consumption_growth <- data$consumption_growth
+
+
+
+# Extract instruments from the data (adjust column names as needed)
+instruments <- as.matrix(data[, c("cay_t", "RREL_t", "avg_excess_return", "phi_t")]) 
+instruments <- scale(instruments, center = rep(1, 4)) # Standardize the instruments
+```
+
+
+Step 2: Define initial guesses for β and γ
+
+```{r}
+# Initial guesses for β and γ
+beta <- 0.98 # Time discount factor
+gamma <- 15  # Risk aversion
+params <- c(beta, gamma) # Combine into a vector
+```
+
+
+
+
+Step 3: Setup Sieve Approximation
+
+
+1. Define B-splines and Tensor Product Basis Functions
+
+```{r}
+# Define knots for ψ and φ based on quantiles
+knots_psi <- quantile(psi, probs = seq(0, 1, length.out = 4))
+knots_phi <- quantile(phi, probs = seq(0, 1, length.out = 4))
+
+# Generate B-spline basis functions
+bs_psi <- bs(psi, knots = knots_psi, degree = 3, intercept = TRUE)
+bs_phi <- bs(phi, knots = knots_phi, degree = 3, intercept = TRUE)
+
+
+# Call the function
+tensor_product <- compute_tensor_product(bs_psi, bs_phi)
+```
+
+
+
+2. Define the SMD Error Term using OLS
+
+```{r}
+# Define the SMD procedure for a given beta and gamma
+smd_error <- function(beta, gamma, psi_t, phi_t, C_growth, returns) {
+  
+  # Dependent variable
+  y <- (1 / beta) * (C_growth^gamma) / returns
+  
+  # Perform OLS
+  ols_result <- lm(y ~ tensor_product - 1)  # "-1" excludes intercept since it's part of design_matrix
+  
+  # Compute residuals
+  residuals <- resid(ols_result)
+  
+  # Return the total squared error
+  mean(residuals^2)
+}
+
+
+```
+
+
+
+3. Define the Estimate Omega Function
+
+
+
+Then we will do the following: 
+1. I will tell you the procedure as I understand it step by step.
+2. You will tell me if this procedure is **exactly** in line with what Sai Ma has done in the first step profile SMD Estimation of Omega.
+
+Let me break the Profile SMD Estimation as can be found in Sai Ma:
+1. Define knots for psi and phi based on the quantiles.
+2. Generate B-spline basis functions for phi and psi.
+3. Generate the tensor product of the B-splines of phi and psi. 
+4. Use the Sieve Least Squares approach to estimate the sieve function. This includes:
+4.1. Estimate the conditional moment condition M(w_t, nu, Omega) = E[chi(z_{t+1}, nu, Omega) | w_t] consistently and nonparametrically. Where w_t are the instruments, z_{t+1} is a vector containing all observations including consumption growth, asset return, aggregate leverage and net worth share. The Sieve Least Square estimator for M_hat(w_t, nu, Omega) = (sum_{t=1}^T chi(z_{t+1}, nu, Omega) * p^(T_J)(w_t)' * (P'P)^(-1)) * p^(T_J)(w)
+4.2. Minimize the weighted quadratic norm of the in step 4.1. estimated conditional expectation functions.
+5. Build a grid of beta and gamma and redo step 4 for every combination of beta and gamma.
+6. Choose the beta and gamma and the Omega that minimizes the weighted quadratic norm of the estimated conditional expectation functions.
+7. Save the estimated Omega_hat as the initial estimate of omega for the GMM estimation of beta and gamma and the final estimate of omega.
+
+
+
+
+
+```{r}
+# Function to fit Ω(ψ, φ)
+estimate_omega <- function(beta, gamma, C_growth, returns, tensor_product) {
+    
+    # Dependent variable calculation for Regression
+    y <- (1 / beta) * (C_growth^gamma) / returns
+    
+    
+    # Perform cross-validation for ridge regression
+    cv_fit <- cv.glmnet(as.matrix(tensor_product),
+                        y,
+                        alpha = 0,
+                        intercept = FALSE)
+    
+    # Extract coefficients for the optimal lambda
+    coefficients <- as.numeric(coef(cv_fit, s = "lambda.min")[-1]) # Exclude intercept
+    
+    
+    # Check the length of omega_coefficients
+    cat("Length of omega_coefficients:",
+        length(coefficients),
+        "\n")
+    cat("Number of columns in tensor_product:",
+        ncol(tensor_product),
+        "\n")
+    
+    # Check for NA values in coefficients
+    if (any(is.na(coefficients))) {
+        stop(
+            "NA values detected in omega_coefficients. Check for multicollinearity or missing data."
+        )
+    }
+    
+    return(coefficients)
+}
+```
+
+
+
+4. Define a beta-gamma-grid and search over it to find the optimal beta and gamma and to calculate my 
+
+
+
+
+
+
+
+
+
+Step 4: GMM Estimation for β and γ and Ω(ψ, φ)
+
+```{r}
+# Compute the SDF
+compute_sdf <- function(beta, gamma, consumption_growth, tensor_product, omega_coefficients) {
+  # Consumption growth term
+  consumption_ratio <- consumption_growth
+  sdf <- beta * (consumption_ratio ^ (-gamma)) * (tensor_product %*% omega_coefficients)
+  return(as.vector(sdf))
+}
+
+# Compute the residuals for GMM
+compute_gmm_residuals <- function(params, consumption_growth, returns, tensor_product, omega_coefficients, instruments) {
+  beta <- params[1]
+  gamma <- params[2]
+  
+  # Compute SDF
+  sdf <- compute_sdf(beta, gamma, consumption_growth, tensor_product, omega_coefficients)
+  
+  # Compute residuals based on Euler equation
+  residuals <- (sdf * returns - 1) %*% instruments
+  
+  
+  # Debugging: Check residual statistics
+  apply(residuals, 2, summary)  # Summarize each moment
+  
+  
+  # Normalize residuals to prevent dominance
+  residuals <- residuals / max(abs(residuals))
+
+  return(residuals)
+}
+
+
+# GMM objective function
+gmm_objective <- function(params, consumption_growth, returns, tensor_product, omega_coefficients, instruments, ...) {
+
+  # Compute residuals
+  residuals <- compute_gmm_residuals(params, consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+  
+  # GMM objective: Minimize the sum of squared residuals
+  return(sum(residuals^2))
+}
+
+gmm_objective_debug <- function(params, consumption_growth, returns, tensor_product, omega_coefficients, instruments) {
+  obj_val <- gmm_objective(params, consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+  cat("Objective Function Value:", obj_val, "\n")
+  return(obj_val)
+}
+
+```
+
+
+
+Step 5: Iterative Procedure
+
+```{r}
+# Tolerance and max iterations
+tolerance <- 1e-8
+max_iterations <- 100
+iteration <- 0
+converged <- FALSE
+
+while (!converged && iteration < max_iterations) {
+  iteration <- iteration + 1
+  
+  print(iteration)
+  
+  
+  # Step 1: Estimate Ω(ψ, φ)
+  omega_coefficients <- estimate_omega(returns, tensor_product)
+  
+  print(cat("Omega Coeffs for tensor product:", omega_coefficients, "\n"))
+  
+  # Step 2: Update β and γ using GMM
+  opt <- optim(
+    par = params,
+    fn = gmm_objective,
+    consumption_growth = consumption_growth,
+    returns = returns,
+    tensor_product = tensor_product,
+    omega_coefficients = omega_coefficients,
+    instruments = instruments,
+    method = "BFGS",
+  control = list(trace = 1, REPORT = 1) 
+  )
+  
+  # Check convergence
+  params_new <- opt$par
+  cat("New Params (Iteration):", params_new, "\n")  # Debug line
+  cat("Param Change:", max(abs(params_new - params)), "\n")
+  if (max(abs(params_new - params)) < tolerance) {
+    converged <- TRUE
+  }
+  
+  params <- params_new # Update parameters
+  cat("Iteration:", iteration, "Beta:", params[1], "Gamma:", params[2], "\n")
+}
+
+# Final estimates
+beta_final <- params[1]
+gamma_final <- params[2]
+omega_final <- omega_coefficients
+
+```
+
+
+
+
+Step 6: Debug Station
+
+```{r}
+# Check dimensions
+cat("Dimensions of tensor_product:", dim(tensor_product), "\n")
+cat("Length of omega_coefficients:", length(omega_coefficients), "\n")
+
+cat("Dimensions of instruments:", dim(instruments), "\n")
+length((sdf * returns - 1))
+
+sum(is.na(returns)) # Count NA values
+sum(is.na(tensor_product)) # Count NA values
+cor_matrix <- cor(tensor_product)
+print(cor_matrix)
+
+summary(tensor_product)
+summary(returns)
+max(tensor_product)
+min(tensor_product)
+
+sum(is.na(psi)) # Count NA values in psi
+sum(is.na(phi)) # Count NA values in phi
+
+sum(is.na(bs_psi)) # Count NA values in bs_psi
+sum(is.na(bs_phi)) # Count NA values in bs_phi
+
+
+
+
+# Compute correlation matrix
+cor_matrix <- cor(tensor_product, use = "complete.obs")
+
+# Check for high correlations
+high_corr <- which(abs(cor_matrix) > 0.9, arr.ind = TRUE)
+cat("Highly correlated columns (threshold > 0.9):\n", high_corr, "\n")
+
+
+# Check structure of tensor_product
+cat("Class of tensor_product:", class(tensor_product), "\n")
+cat("Is tensor_product a matrix?:", is.matrix(tensor_product), "\n")
+cat("Dimensions of tensor_product:", dim(tensor_product), "\n")
+
+# Check structure of omega_coefficients
+cat("Class of omega_coefficients:", class(omega_coefficients), "\n")
+cat("Is omega_coefficients numeric?:", is.numeric(omega_coefficients), "\n")
+cat("Length of omega_coefficients:", length(omega_coefficients), "\n")
+
+gamma_values <- seq(5, 20, by = 0.5)  # Test gamma values
+objective_values <- sapply(gamma_values, function(g) {
+  gmm_objective(c(params[1], g), consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+})
+
+plot(gamma_values, objective_values, type = "l", main = "GMM Objective Function", xlab = "Gamma", ylab = "Objective Value")
+
+
+beta_values <- seq(0.5, 1.5, by = 0.05)
+objective_values <- sapply(beta_values, function(g) {
+  gmm_objective(c(params[2], g), consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+})
+plot(beta_values, objective_values, type = "l", main = "GMM Objective Function", xlab = "Beta", ylab = "Objective Value")
+
+
+
+apply(data[c("psi_t", "phi_t", "consumption_growth", "returns")], 2, sd)
+
+
+summary(consumption_growth)
+hist(consumption_growth, breaks = 50, main = "Distribution of Consumption Growth")
+
+gamma_values <- seq(0, 50, by = 0.1)
+objective_values <- sapply(gamma_values, function(g) {
+  gmm_objective(c(params[1], g), consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+})
+
+plot(gamma_values, objective_values, type = "l", main = "GMM Objective Function", xlab = "Gamma", ylab = "Objective Value")
+
+
+beta_values <- seq(-5, 15, by = 0.25)
+objective_values <- sapply(beta_values, function(b) {
+  gmm_objective(c(b, params[2]), consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+})
+
+plot(beta_values, objective_values, type = "l", main = "GMM Objective Function", xlab = "Beta", ylab = "Objective Value")
+
+cor_matrix <- cor(tensor_product)
+hist(cor_matrix[lower.tri(cor_matrix)], breaks = 50, main = "Correlation of Basis Functions")
+
+
+print(summary(omega_coefficients))
+plot(omega_coefficients, main = "Estimated Omega Coefficients")
+
+summary(tensor_product)
+range(tensor_product)
+
+
+summary(returns)
+hist(returns, breaks = 50, main = "Distribution of Returns")
+
+print(cv_fit$lambda.min)
+plot(cv_fit)
+
+
+summary(coefficients)
+plot(coefficients, main = "Estimated Omega Coefficients")
+
+length(knots_psi)
+length(knots_phi)
+
+
+
+# Step 1: Fix phi_t at its mean
+phi_mean <- quantile(phi, probs = 0.5)  # Calculate mean of phi_t
+
+# Step 2: Define a range of psi_t values
+psi_range <- seq(min(psi), max(psi), length.out = 100)  # Generate range of psi_t values
+
+# Step 3: Compute B-spline basis functions for psi_t and fixed phi_t
+bs_psi <- bs(psi_range, knots = knots_psi, degree = 3, intercept = TRUE)  # Basis for psi_t
+bs_phi_fixed <- bs(rep(phi_mean, 100), knots = knots_phi, degree = 3, intercept = TRUE)  # Basis for phi_t
+
+# Step 4: Compute the tensor product for the fixed phi_t
+tensor_product_fixed <- apply(bs_psi, 1, function(row) {
+  as.vector(outer(row, bs_phi_fixed[1, ]))  # Tensor product for each psi_t
+})
+tensor_product_fixed <- t(tensor_product_fixed)  # Ensure correct dimensions
+
+# Step 5: Evaluate the omega function
+omega_values <- tensor_product_fixed %*% omega_coefficients
+
+# Step 6: Plot the omega function against psi_t
+plot(psi_range, omega_values, type = "l", col = "blue", lwd = 2,
+     xlab = expression(psi[t]), ylab = expression(Omega(psi[t], phi[t])),
+     main = expression(paste("Omega Function with ", phi[t], " = Mean(", phi[t], ")")))
+
+
+
+psi_mean <- mean(psi)
+
+# Step 2: Define a range of phi_t values
+phi_range <- seq(min(phi), max(phi), length.out = 100)  # Generate range of phi_t values
+
+# Step 3: Compute B-spline basis functions for phi_t and fixed psi_t
+bs_phi <- bs(phi_range, knots = knots_phi, degree = 3, intercept = TRUE)  # Basis for phi_t
+bs_psi_fixed <- bs(rep(psi_mean, 100), knots = knots_psi, degree = 3, intercept = TRUE)  # Basis for psi_t
+
+# Step 4: Compute the tensor product for the fixed psi_t
+tensor_product_fixed <- apply(bs_phi, 1, function(row) {
+  as.vector(outer(row, bs_psi_fixed[1, ]))  # Tensor product for each phi_t
+})
+tensor_product_fixed <- t(tensor_product_fixed)  # Ensure correct dimensions
+
+# Step 5: Evaluate the omega function
+omega_values <- tensor_product_fixed %*% omega_coefficients
+
+# Step 6: Plot the omega function against phi_t
+plot(phi_range, omega_values, type = "l", col = "blue", lwd = 2,
+     xlab = expression(phi[t]), ylab = expression(Omega(psi[t], phi[t])),
+     main = expression(paste("Omega Function with ", psi[t], " = Mean(", psi[t], ")")))
+
+
+quantile(psi)
+quantile(log(phi))
+exp(3)
+
+
+beta_values <- seq(0.5, 2, length.out = 20)
+gamma_values <- seq(0.5, 50, length.out = 20)
+
+objective_values <- outer(beta_values, gamma_values, Vectorize(function(beta, gamma) {
+  gmm_objective(c(beta, gamma), consumption_growth, returns, tensor_product, omega_coefficients, instruments)
+}))
+
+
+plot_ly(x = beta_values, y = gamma_values, z = objective_values) %>%
+    add_surface() %>%
+    layout(
+        title = "Reconstructed Omega(psi, phi)",
+        scene = list(
+            xaxis = list(title = "beta"),
+            yaxis = list(title = "gamma"),
+            zaxis = list(title = "objective")
+        )
+    )
+
+
+
+apply(instruments, 2, summary)  # Summarize each instrument
+
+cor_psi <- cor(data$psi_t, instruments)
+cor_phi <- cor(data$phi_t, instruments)
+
+
+cat("Correlation with Psi:", cor_psi, "\n")
+cat("Correlation with Phi:", cor_phi, "\n")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+# Fama Macbeth regression
+
+```{r}
+## Step 3: Compute Risk Prices Using Linear Model
+
+# Compute \beta_j,c and \beta_j,\Omega for each asset
+betas <- lapply(split(df_all_assets, df_all_assets$asset_id), function(asset_data) {
+    # Time-series regression for each asset
+    fit <- lm(returns ~ consumption_growth + log(tensor_product %*% omega_coefficients), data = df_all_assets)
+    return(coef(fit))  # Return coefficients (factor loadings)
+})
+betas <- do.call(rbind, betas)  # Combine results for all assets into a matrix or data frame
+colnames(betas) <- c("(Intercept)", "consumption_growth", "log(omega_estimated_gmm)")  # Ensure proper column names
+
+# Prepare a data frame for cross-sectional regression
+cross_sectional_data <- data.frame(
+    avg_excess_return = tapply(df_all_assets$avg_excess_return, df_all_assets$asset_id, mean),
+    consumption_growth_beta = betas[, "consumption_growth"],
+    omega_beta = betas[, "log(omega_estimated_gmm)"]
+)
+
+# Cross-sectional regression for risk prices
+cross_sectional_fit <- lm(avg_excess_return ~ consumption_growth_beta + omega_beta, data = cross_sectional_data)
+
+# Extract risk prices
+lambda_c <- coef(cross_sectional_fit)["consumption_growth_beta"]  # Risk price of consumption growth
+lambda_omega <- coef(cross_sectional_fit)["omega_beta"]  # Risk price of \Omega
+
+## Results
+cat("Risk price of consumption growth (lambda_c):", lambda_c, "\n")  # Output \lambda_c
+cat("Risk price of omega (lambda_omega):", lambda_omega, "\n")  # Output \lambda_\Omega
+```
+
+
+
+# Expected Return-Beta Representation
+```{r}
+# Step 6: Compute Expected Return-Beta Representation
+# Load necessary libraries
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
 

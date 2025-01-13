@@ -1,0 +1,131 @@
+---
+title: "Seminar Paper"
+author: "Janik Müller"
+format: pdf
+date: today
+toc: true
+linestretch: 1.5
+---
+
+
+\newpage
+
+# 1 Introduction
+
+What should be answered here:
+
+* What is the problem?
+* Why is it important?
+* What is my approach?
+* What are the key results?
+* What papers already talked about this topic?
+* What is the structure of the paper?
+* What is different between the paper I am re-building on and my paper?
+
+
+
+A lot of research is currently being done on the impact financial intermediaries have on pricing different asset classes. After the development of the consumption based asset pricing model (CCAPM) by **Citation needed** the focus started to shift onto the role financial intermediates play in this regard. 
+The empirical findings of **AEM** and **HKM** where it was discovered that a stochastic discount factor (SDF) that includes the intermediary's balance sheet data possess an intriguing potential in explaining the risk-premia in a cross-section of asset returns. In the aforementioned papers the intermediary sector was assumed to be homogeneous. **Check if this is true!**
+However, in reality the intermediary sector is heterogeneous and the balance sheet data of different intermediaries can vary significantly. The paper of **SA MAI** aimed to extend the work on **AEM** and **HKM** by introducing a heterogeneous intermediary stochastic discount factor (HI-SDF) that includes the balance sheet data of two different types of intermediaries. Furthermore, **SA MAI's** paper also incorporated a non-linear functional form for the intermediary's contributions build on top of the established CCAPM model using the power utility of the households. 
+Since **SA MAI** uses data up until the COVID-19 pandemic, the aim of this paper is to therefore replicate the results and to further investigate if the estimates and the pricing-abilities of HI-SDF, in the proposed functional form, was in any way affected by the COVID-19 crisis. 
+Following the methodology of **SA MAI**, the paper will use a two-step estimation procedure to estimate the parameters of the HI-SDF.
+The first step is to estimate the intermediary-specific parameters using the *Sieve minimum distance* and then using these intermediary-specific-estimates in a second step GMM framework to estimate the risk-aversion parameters of the households.
+
+A better understanding of the role and functional form of financial intermediaries in asset pricing may lead to more robustness in the pricing of different securities and may help in determining the absurdly high risk-aversion parameters estimated by CCAPM models throughout the literature.
+
+
+
+
+# 2 Methodology and Data
+
+## 2.1 Structure of the HI-SDF
+
+What should be answered here:
+
+* What is the HI-SDF?
+* What are the key components of the HI-SDF? (Functional Form, Parameters)
+* How does the HI-SDF work?
+* What are the key parameters of the HI-SDF?
+* What are the key equations of the HI-SDF?
+* What are the key assumptions of the HI-SDF?
+* What are the key limitations of the HI-SDF?
+* What are the key advantages of the HI-SDF?
+* What are the key disadvantages of the HI-SDF?
+
+
+## 2.2 Estimation Procedure
+
+What should be answered here:
+
+* What is the estimation procedure?
+* What are the key steps of the estimation procedure?
+* What are the key assumptions of the estimation procedure?
+* What are the key limitations of the estimation procedure?
+* What are the key advantages of the estimation procedure?
+* What are the key disadvantages of the estimation procedure?
+* Why use the two-step estimation procedure and not the one-step estimation procedure?
+
+
+## 2.3 Data
+
+What should be answered here:
+
+* What data was used?
+* What are the key variables of the data?
+* Where is the data from and where can it be found?
+* Why was this data used?
+* Which time frame does the data cover?
+
+
+# 3 Empirical Results
+
+## 3.1 Parameter Estimation Results
+
+What should be answered here:
+
+* What are the key parameter estimates?
+* What are the key parameter estimates' standard errors?
+* What are the key parameter estimates' confidence intervals?
+* What are the key parameter estimates' p-values?
+* Are the parameters in line with the literature?
+* How do the parameters compared to the literature?
+* Display the parameter estimates in a table.
+* Display the highly non-linear relationship between the parameters in a plot (page 17 of paper).
+* Compare Parameter Results between using the efficient GMM weighing matrix and the identity matrix.
+
+## 3.2 Asset Pricing Tests
+
+What should be answered here:
+
+
+### 3.2.1 Parameter Behaviour with major Economic Indicators
+
+* How do the parameters behave compared move with the GDP and major economic indicators?
+
+### 3.2.2 Fama-MacBeth Regressions
+
+* Perform linear tests and how well the model explains the asset returns.
+* Explain how Fama-MacBeth Regressions work.
+* Perform Fama-MacBeth Regressions and explain the results.
+
+
+### 3.2.3 Non-linear Test
+* Explain how the Hansen-Jagannathan Distance Test works.
+* Perform the Hansen-Jagannathan Distance Test and explain the results.
+
+
+### 3.2.4 Model Robustness
+
+* With respect to Covid-19 Crisis.
+* With Respect to out of sample performance (page 31 of the paper).
+
+
+# 4 Conclusion
+
+What should be answered here:
+
+* What are the key results?
+* What are the key implications?
+* What are the key limitations of my paper and what could be elaborated on?
+* What are the key future research directions?
+* Are the results of my analysis in line with the literature, especially with the paper I am re-building on?

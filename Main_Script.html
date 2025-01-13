@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Janik Müller">
-<meta name="dcterms.date" content="2024-11-21">
+<meta name="dcterms.date" content="2025-01-08">
 
 <title>Master Seminar Paper Intermediary Asset Pricing</title>
 <style>
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -47,8 +81,23 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#synopsis" id="toc-synopsis" class="nav-link active" data-scroll-target="#synopsis">Synopsis</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#synopsis" id="toc-synopsis" class="nav-link active" data-scroll-target="#synopsis">0 Synopsis</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">1 Introduction</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">2 Data</a>
+  <ul class="collapse">
+  <li><a href="#data-import" id="toc-data-import" class="nav-link" data-scroll-target="#data-import">2.1 Data Import</a></li>
+  <li><a href="#data-cleaning" id="toc-data-cleaning" class="nav-link" data-scroll-target="#data-cleaning">2.2 Data Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#broker-dealer-bd---leverage-ratio" id="toc-broker-dealer-bd---leverage-ratio" class="nav-link" data-scroll-target="#broker-dealer-bd---leverage-ratio">2.2.1 Broker Dealer (BD) - Leverage Ratio</a></li>
+  <li><a href="#bank-holding-company-bhc---leverage-ratio" id="toc-bank-holding-company-bhc---leverage-ratio" class="nav-link" data-scroll-target="#bank-holding-company-bhc---leverage-ratio">2.2.2 Bank Holding Company (BHC) - Leverage Ratio</a></li>
+  <li><a href="#aggregate-leverage-ratio" id="toc-aggregate-leverage-ratio" class="nav-link" data-scroll-target="#aggregate-leverage-ratio">2.2.3 Aggregate Leverage Ratio</a></li>
+  <li><a href="#net-worth-share-calculation" id="toc-net-worth-share-calculation" class="nav-link" data-scroll-target="#net-worth-share-calculation">2.2.4 Net Worth Share Calculation</a></li>
+  <li><a href="#personal-expenditure---consumption-growth" id="toc-personal-expenditure---consumption-growth" class="nav-link" data-scroll-target="#personal-expenditure---consumption-growth">2.2.5 Personal Expenditure - Consumption Growth</a></li>
+  <li><a href="#historical-return-data" id="toc-historical-return-data" class="nav-link" data-scroll-target="#historical-return-data">2.2.6 Historical Return Data</a></li>
+  <li><a href="#more-data-may-be-added-later-here" id="toc-more-data-may-be-added-later-here" class="nav-link" data-scroll-target="#more-data-may-be-added-later-here">2.2.7 More data may be added later here!</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#estimation-of-the-hi-sdf-model" id="toc-estimation-of-the-hi-sdf-model" class="nav-link" data-scroll-target="#estimation-of-the-hi-sdf-model">3 Estimation of the HI-SDF Model</a></li>
   </ul>
 </nav>
 </div>
@@ -73,7 +122,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 21, 2024</p>
+      <p class="date">January 8, 2025</p>
     </div>
   </div>
   
@@ -85,13 +134,539 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="synopsis" class="level2">
-<h2 class="anchored" data-anchor-id="synopsis">Synopsis</h2>
+<section id="synopsis" class="level1">
+<h1>0 Synopsis</h1>
 <p>We will use this document to write our seminar paper. We will use the <code>quarto</code> package to write the paper in a literate programming style. This means that we will write the paper in a single document that includes both the content and the code used to generate the content. This will allow us to easily reproduce the results in the paper. Furthermore, we will submit a separate pdf file that only includes the text without the need to run the code. Moreover, we will use the <code>quarto</code> package to generate the pdf file where the code is hidden.</p>
 </section>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In this paper, we will investigate the intermediary asset pricing model proposed by Adrian, Etula, and Muir (2014). The model is based on the idea that intermediaries play a key role in the asset pricing process. The model is an extension of the standard consumption-based asset pricing model, where the intermediary sector is explicitly modeled. The model is able to explain several empirical puzzles in the asset pricing literature, such as the low risk-free rate puzzle and the high equity premium puzzle. We will use the model to analyze the implications of intermediary asset pricing for the equity premium, the risk-free rate, and the term structure of interest rates. We will also compare the model’s predictions to the data and discuss the model’s implications for asset pricing theory.</p>
+<section id="introduction" class="level1">
+<h1>1 Introduction</h1>
+<p>In this paper, we will investigate the intermediary asset pricing model proposed by Sa Mai (2023) where a semi parametric approach was used in to model the heterogeneous intermediary stochastic discount factor (HI-SDF).</p>
+</section>
+<section id="data" class="level1">
+<h1>2 Data</h1>
+<p>First, let us check the data that we have available for our analysis.</p>
+<section id="data-import" class="level2">
+<h2 class="anchored" data-anchor-id="data-import">2.1 Data Import</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import all data files</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">process_data_directory</span>(<span class="at">data_dir =</span> data_dir)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Successfully Loaded: change_to_date"                            
+ [2] "Successfully Loaded: data_dir"                                  
+ [3] "Successfully Loaded: df_10_Portfolios_Prior_60_13"              
+ [4] "Successfully Loaded: df_25_Portfolios_5x5"                      
+ [5] "Successfully Loaded: df_25_Portfolios_ME_INV_5x5"               
+ [6] "Successfully Loaded: df_25_Portfolios_ME_OP_5x5"                
+ [7] "Successfully Loaded: df_F-F_Benchmark_Factors_Quarterly"        
+ [8] "Successfully Loaded: df_F-F_Research_Data_Factors"              
+ [9] "Successfully Loaded: df_He_Kelly_Manela_Factors_And_Test_Assets"
+[10] "Successfully Loaded: df_L.130"                                  
+[11] "Successfully Loaded: df_L.131"                                  
+[12] "Successfully Loaded: df_PCECC96"                                
+[13] "Successfully Loaded: df_TB3MS"                                  
+[14] "Successfully Loaded: list_of_files"                             
+[15] "Successfully Loaded: process_data_directory"                    </code></pre>
+</div>
+</div>
+</section>
+<section id="data-cleaning" class="level2">
+<h2 class="anchored" data-anchor-id="data-cleaning">2.2 Data Cleaning</h2>
+<section id="broker-dealer-bd---leverage-ratio" class="level3">
+<h3 class="anchored" data-anchor-id="broker-dealer-bd---leverage-ratio">2.2.1 Broker Dealer (BD) - Leverage Ratio</h3>
+<p>For the broker dealers we are going to use the total financial assets and liabilities to calculate the leverage ratio.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Assets</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Total Assets and Total Liabilities and Equity for Broker Dealers</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>total_assets_bd <span class="ot">&lt;-</span> df_L<span class="fl">.130</span> <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Descriptions:</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Security brokers and dealers; total financial assets"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>total_assets_bd <span class="ot">&lt;-</span> total_assets_bd <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="st">"Descriptions:"</span>, <span class="sc">-</span><span class="st">"Unit:"</span>, <span class="sc">-</span><span class="st">"Currency:"</span>, <span class="sc">-</span><span class="st">"Unique Identifier:"</span>, <span class="sc">-</span><span class="st">"Series Name:"</span>, <span class="sc">-</span><span class="st">"Multiplier:"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace ND with NA</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>total_assets_bd <span class="ot">&lt;-</span> total_assets_bd <span class="sc">%&gt;%</span> </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">~</span> <span class="fu">as.numeric</span>(.)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>           )</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Total Assets into long format</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>total_assets_bd_long <span class="ot">&lt;-</span> total_assets_bd <span class="sc">%&gt;%</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">cols =</span> <span class="fu">everything</span>(),</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">names_to =</span> <span class="st">"Quarter"</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">values_to =</span> <span class="st">"Value"</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Quarter <span class="sc">&gt;=</span> <span class="st">"1970 Q1"</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="do">### Liabilities</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Total Liabilities and Equity for Broker Dealers</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>total_liabilities_bd <span class="ot">&lt;-</span> df_L<span class="fl">.130</span> <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Descriptions:</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Security brokers and dealers; total liabilities"</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>total_liabilities_bd <span class="ot">&lt;-</span> total_liabilities_bd <span class="sc">%&gt;%</span> </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="st">"Descriptions:"</span>, <span class="sc">-</span><span class="st">"Unit:"</span>, <span class="sc">-</span><span class="st">"Currency:"</span>, <span class="sc">-</span><span class="st">"Unique Identifier:"</span>, <span class="sc">-</span><span class="st">"Series Name:"</span>, <span class="sc">-</span><span class="st">"Multiplier:"</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace ND with NA</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>total_liabilities_bd <span class="ot">&lt;-</span> total_liabilities_bd <span class="sc">%&gt;%</span> </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(),</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">~</span> <span class="fu">as.numeric</span>(.)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>           )</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Total Liabilities into long format</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>total_liabilities_bd_long <span class="ot">&lt;-</span> total_liabilities_bd <span class="sc">%&gt;%</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">cols =</span> <span class="fu">everything</span>(),</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>        <span class="at">names_to =</span> <span class="st">"Quarter"</span>,</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">values_to =</span> <span class="st">"Value"</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Quarter <span class="sc">&gt;=</span> <span class="st">"1970 Q1"</span>)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the leverage ratio</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>leverage_ratio_bd <span class="ot">&lt;-</span> total_assets_bd <span class="sc">/</span> (total_assets_bd <span class="sc">-</span> total_liabilities_bd)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(df_L<span class="fl">.130</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>Plot of the Log-Leverage of Broker Dealers:</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `trans` argument of `continuous_scale()` is deprecated as of ggplot2 3.5.0.
+ℹ Please use the `transform` argument instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Main_Script_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="bank-holding-company-bhc---leverage-ratio" class="level3">
+<h3 class="anchored" data-anchor-id="bank-holding-company-bhc---leverage-ratio">2.2.2 Bank Holding Company (BHC) - Leverage Ratio</h3>
+<p>For the bank holding companies we are going to use the total financial assets and liabilities to calculate the leverage ratio.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Total Assets and Total Liabilities and Equity for Bank Holding Companies</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>total_assets_bhc <span class="ot">&lt;-</span> df_L<span class="fl">.131</span> <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Descriptions:</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Holding companies; total financial assets"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>total_assets_bhc <span class="ot">&lt;-</span> total_assets_bhc <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="st">"Descriptions:"</span>, <span class="sc">-</span><span class="st">"Unit:"</span>, <span class="sc">-</span><span class="st">"Currency:"</span>, <span class="sc">-</span><span class="st">"Unique Identifier:"</span>, <span class="sc">-</span><span class="st">"Series Name:"</span>, <span class="sc">-</span><span class="st">"Multiplier:"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace ND with NA</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>total_assets_bhc <span class="ot">&lt;-</span> total_assets_bhc <span class="sc">%&gt;%</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">~</span> <span class="fu">as.numeric</span>(.)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>           )</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Total Liabilities and Equity for Bank Holding Companies</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>total_liabilities_bhc <span class="ot">&lt;-</span> df_L<span class="fl">.131</span> <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Descriptions:</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Holding companies; total liabilities"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the columns</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>total_liabilities_bhc <span class="ot">&lt;-</span> total_liabilities_bhc <span class="sc">%&gt;%</span> </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="st">"Descriptions:"</span>, <span class="sc">-</span><span class="st">"Unit:"</span>, <span class="sc">-</span><span class="st">"Currency:"</span>, <span class="sc">-</span><span class="st">"Unique Identifier:"</span>, <span class="sc">-</span><span class="st">"Series Name:"</span>, <span class="sc">-</span><span class="st">"Multiplier:"</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace ND with NA</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>total_liabilities_bhc <span class="ot">&lt;-</span> total_liabilities_bhc <span class="sc">%&gt;%</span> </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(),</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">~</span> <span class="fu">as.numeric</span>(.)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>           )</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the leverage ratio</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>leverage_ratio_bhc <span class="ot">&lt;-</span> total_assets_bhc <span class="sc">/</span> (total_assets_bhc <span class="sc">-</span> total_liabilities_bhc)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co">#rm(df_L.131)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>Plot of the Log-Leverage of Bank Holding Companies:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Main_Script_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><br></p>
+</section>
+<section id="aggregate-leverage-ratio" class="level3">
+<h3 class="anchored" data-anchor-id="aggregate-leverage-ratio">2.2.3 Aggregate Leverage Ratio</h3>
+<p>We will calculate the aggregate leverage ratio for the broker dealers and bank holding companies. Defined as total assets BD and BHC over total equity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the aggregate leverage ratio</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>aggregate_leverage <span class="ot">&lt;-</span> (total_assets_bd <span class="sc">+</span> total_assets_bhc) <span class="sc">/</span> (total_assets_bd <span class="sc">+</span> total_assets_bhc <span class="sc">-</span> total_liabilities_bd <span class="sc">-</span> total_liabilities_bhc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>Plot the aggregate Leverage Ratio:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Main_Script_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="net-worth-share-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="net-worth-share-calculation">2.2.4 Net Worth Share Calculation</h3>
+<p>We will calculate the net worth share for the broker dealers and bank holding companies.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the Net Worth Share</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>net_worth_share <span class="ot">&lt;-</span> (total_assets_bhc <span class="sc">-</span> total_liabilities_bhc) <span class="sc">/</span> ((total_assets_bhc <span class="sc">+</span> total_assets_bd) <span class="sc">-</span> (total_liabilities_bhc <span class="sc">+</span> total_liabilities_bd))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Plot of the net worth share:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Main_Script_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="personal-expenditure---consumption-growth" class="level3">
+<h3 class="anchored" data-anchor-id="personal-expenditure---consumption-growth">2.2.5 Personal Expenditure - Consumption Growth</h3>
+<p>We will calculate the consumption growth rate for the personal expenditure data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the consumption growth rate</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df_pce_growth <span class="ot">&lt;-</span> df_PCECC96 <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">as.yearqtr</span>(DATE, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>DATE, <span class="at">PCE =</span> PCECC96) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Quarter <span class="sc">&gt;=</span> <span class="st">"1969 Q4"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">pce_growth =</span> PCE <span class="sc">/</span> <span class="fu">lag</span>(PCE) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">!=</span> <span class="dv">1</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(df_PCECC96)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we will plot the consumption growth rate:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Main_Script_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="historical-return-data" class="level3">
+<h3 class="anchored" data-anchor-id="historical-return-data">2.2.6 Historical Return Data</h3>
+<p>We will calculate the historical return data for equity, non-equity, risk-free (i.e.&nbsp;treasury bill), commodities, CDS, options and FX data, as well as a combined portfolio.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Equity Portfolios</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># List the Dataframes</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>list_of_dataframes <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"df_10_Portfolios_Prior_60_13"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"df_25_Portfolios_5x5"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"df_25_Portfolios_ME_INV_5x5"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"df_25_Portfolios_ME_OP_5x5"</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Change dataframes to date format</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dataframe_name <span class="cf">in</span> list_of_dataframes) {</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Retrieve the dataframe by name</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    dataframe <span class="ot">&lt;-</span> <span class="fu">get</span>(dataframe_name)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply the function</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    modified_dataframe <span class="ot">&lt;-</span> <span class="fu">change_to_date</span>(dataframe)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Assign the modified dataframe back to its original name</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assign</span>(dataframe_name, modified_dataframe)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove the modified dataframe from the environment</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rm</span>(modified_dataframe)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge dataframes in the list of dataframes on date column</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>df_equity_monthly <span class="ot">&lt;-</span> df_10_Portfolios_Prior_60_13 <span class="sc">%&gt;%</span> </span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(df_25_Portfolios_5x5, <span class="at">by =</span> <span class="st">"date"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(df_25_Portfolios_ME_INV_5x5, <span class="at">by =</span> <span class="st">"date"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(df_25_Portfolios_ME_OP_5x5, <span class="at">by =</span> <span class="st">"date"</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Make Returns decimal number</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>df_equity_monthly <span class="ot">&lt;-</span> df_equity_monthly <span class="sc">%&gt;%</span> </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span>date, <span class="sc">~</span> . <span class="sc">/</span> <span class="dv">100</span>))</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Turn monthly returns into quarterly returns</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>df_equity <span class="ot">&lt;-</span> df_equity_monthly <span class="sc">%&gt;%</span> </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">as.yearqtr</span>(date, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Quarter) <span class="sc">%&gt;%</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="sc">-</span>date, <span class="sc">~</span> <span class="fu">prod</span>(<span class="dv">1</span> <span class="sc">+</span> .) <span class="sc">-</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="more-data-may-be-added-later-here" class="level3">
+<h3 class="anchored" data-anchor-id="more-data-may-be-added-later-here">2.2.7 More data may be added later here!</h3>
+</section>
+</section>
+</section>
+<section id="estimation-of-the-hi-sdf-model" class="level1">
+<h1>3 Estimation of the HI-SDF Model</h1>
+<p>In this section, we will estimate the HI-SDF model proposed by Sa Mai (2023).</p>
+<p>First we will define the moment conditions and the sieve estimation of the conditional mean M(w_t).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Starting values of Estimation</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fl">0.99</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Step 1: Set Up Sieve Basis Functions (Cubic B-Splines)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splines)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create basis functions for \psi_t and \phi_t</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>create_basis <span class="ot">&lt;-</span> <span class="cf">function</span>(data, var, <span class="at">knots =</span> <span class="dv">5</span>) {</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  range_var <span class="ot">&lt;-</span> <span class="fu">range</span>(data[[var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">bs</span>(data[[var]], <span class="at">degree =</span> <span class="dv">3</span>, <span class="at">knots =</span> <span class="fu">seq</span>(range_var[<span class="dv">1</span>], range_var[<span class="dv">2</span>], <span class="at">length.out =</span> knots), <span class="at">intercept =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate basis functions</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>basis_psi <span class="ot">&lt;-</span> <span class="fu">create_basis</span>(data, <span class="st">"psi_t"</span>, <span class="at">knots =</span> <span class="dv">5</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>basis_phi <span class="ot">&lt;-</span> <span class="fu">create_basis</span>(data, <span class="st">"phi_t"</span>, <span class="at">knots =</span> <span class="dv">5</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Create tensor product of basis functions</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>create_tensor_product <span class="ot">&lt;-</span> <span class="cf">function</span>(basis_psi, basis_phi) {</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  n_psi <span class="ot">&lt;-</span> <span class="fu">ncol</span>(basis_psi)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  n_phi <span class="ot">&lt;-</span> <span class="fu">ncol</span>(basis_phi)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  tensor_product <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(basis_psi), <span class="at">ncol =</span> n_psi <span class="sc">*</span> n_phi)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  col_idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_psi) {</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_phi) {</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>      tensor_product[, col_idx] <span class="ot">&lt;-</span> basis_psi[, i] <span class="sc">*</span> basis_phi[, j]</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>      col_idx <span class="ot">&lt;-</span> col_idx <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tensor_product)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>basis_tensor <span class="ot">&lt;-</span> <span class="fu">create_tensor_product</span>(basis_psi, basis_phi)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="do">## Step 2: Sieve Minimum Distance Estimation of \Omega</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the objective function for SMD estimation</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>smd_objective <span class="ot">&lt;-</span> <span class="cf">function</span>(params, basis_tensor, returns, consumption_growth, leverage, net_worth) {</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> params[<span class="dv">1</span>]</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> params[<span class="dv">2</span>]</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute \Omega as a linear combination of basis functions</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>  omega <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(basis_tensor <span class="sc">%*%</span> params[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)])</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute the SDF m_t = beta * (C_t / C_t-1)^(-gamma) * \Omega</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>  sdf <span class="ot">&lt;-</span> beta <span class="sc">*</span> (consumption_growth<span class="sc">^</span>(<span class="sc">-</span>gamma)) <span class="sc">*</span> omega</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute residuals for the moment conditions</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>  residuals <span class="ot">&lt;-</span> sdf <span class="sc">*</span> returns <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return the sum of squared residuals</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(residuals<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial parameters: beta, gamma, and coefficients for \Omega</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>init_params <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.99</span>, <span class="dv">10</span>, <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">ncol</span>(basis_tensor)))</span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimization for SMD estimation</span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>optim_result <span class="ot">&lt;-</span> <span class="fu">optim</span>(</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">par =</span> init_params,</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn =</span> smd_objective,</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>  <span class="at">basis_tensor =</span> basis_tensor,</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>  <span class="at">returns =</span> data<span class="sc">$</span>returns,</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">consumption_growth =</span> data<span class="sc">$</span>consumption_growth,</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">leverage =</span> data<span class="sc">$</span>phi_t,</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">net_worth =</span> data<span class="sc">$</span>psi_t,</span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"BFGS"</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract estimated parameters</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="ot">&lt;-</span> optim_result<span class="sc">$</span>par[<span class="dv">1</span>]</span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>gamma_hat <span class="ot">&lt;-</span> optim_result<span class="sc">$</span>par[<span class="dv">2</span>]</span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>omega_hat <span class="ot">&lt;-</span> optim_result<span class="sc">$</span>par[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)]</span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a><span class="do">## Step 3: GMM Estimation of Risk Prices</span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute \Omega from the estimated parameters</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>omega_estimated <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(basis_tensor <span class="sc">%*%</span> omega_hat)</span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute \beta_j,c and \beta_j,\Omega for each asset</span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">split</span>(data, data<span class="sc">$</span>asset_id), <span class="cf">function</span>(asset_data) {</span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(returns <span class="sc">~</span> consumption_growth <span class="sc">+</span> <span class="fu">log</span>(omega_estimated), <span class="at">data =</span> asset_data)</span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">coef</span>(fit))</span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, betas)</span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross-sectional regression for risk prices</span></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>cross_sectional_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(avg_excess_return <span class="sc">~</span> betas[, <span class="st">"consumption_growth"</span>] <span class="sc">+</span> betas[, <span class="st">"log(omega_estimated)"</span>], <span class="at">data =</span> data)</span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract risk prices</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a>lambda_c <span class="ot">&lt;-</span> <span class="fu">coef</span>(cross_sectional_fit)[<span class="st">"betas[, </span><span class="sc">\"</span><span class="st">consumption_growth</span><span class="sc">\"</span><span class="st">]"</span>]</span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>lambda_omega <span class="ot">&lt;-</span> <span class="fu">coef</span>(cross_sectional_fit)[<span class="st">"betas[, </span><span class="sc">\"</span><span class="st">log(omega_estimated)</span><span class="sc">\"</span><span class="st">]"</span>]</span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="do">## Results</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Estimated beta:"</span>, beta_hat, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Estimated gamma:"</span>, gamma_hat, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Risk price of consumption growth (lambda_c):"</span>, lambda_c, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Risk price of omega (lambda_omega):"</span>, lambda_omega, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Step 1: Estimate \omega Using Sieve Minimum Distance (SMD)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splines)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create basis functions for \psi_t and \phi_t</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>create_basis <span class="ot">&lt;-</span> <span class="cf">function</span>(data, var, <span class="at">knots =</span> <span class="dv">5</span>) {</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  range_var <span class="ot">&lt;-</span> <span class="fu">range</span>(data[[var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">bs</span>(data[[var]], <span class="at">degree =</span> <span class="dv">3</span>, <span class="at">knots =</span> <span class="fu">seq</span>(range_var[<span class="dv">1</span>], range_var[<span class="dv">2</span>], <span class="at">length.out =</span> knots), <span class="at">intercept =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate basis functions</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>basis_psi <span class="ot">&lt;-</span> <span class="fu">create_basis</span>(data, <span class="st">"psi_t"</span>, <span class="at">knots =</span> <span class="dv">5</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>basis_phi <span class="ot">&lt;-</span> <span class="fu">create_basis</span>(data, <span class="st">"phi_t"</span>, <span class="at">knots =</span> <span class="dv">5</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Create tensor product of basis functions</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>create_tensor_product <span class="ot">&lt;-</span> <span class="cf">function</span>(basis_psi, basis_phi) {</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  n_psi <span class="ot">&lt;-</span> <span class="fu">ncol</span>(basis_psi)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  n_phi <span class="ot">&lt;-</span> <span class="fu">ncol</span>(basis_phi)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  tensor_product <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(basis_psi), <span class="at">ncol =</span> n_psi <span class="sc">*</span> n_phi)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  col_idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_psi) {</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_phi) {</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>      tensor_product[, col_idx] <span class="ot">&lt;-</span> basis_psi[, i] <span class="sc">*</span> basis_phi[, j]</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>      col_idx <span class="ot">&lt;-</span> col_idx <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tensor_product)</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>basis_tensor <span class="ot">&lt;-</span> <span class="fu">create_tensor_product</span>(basis_psi, basis_phi)</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the objective function for SMD estimation</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>smd_objective <span class="ot">&lt;-</span> <span class="cf">function</span>(params, basis_tensor, returns, consumption_growth, leverage, net_worth) {</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> params[<span class="dv">1</span>]</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> params[<span class="dv">2</span>]</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute \Omega as a linear combination of basis functions</span></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>  omega <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(basis_tensor <span class="sc">%*%</span> params[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)])</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute the SDF m_t = beta * (C_t / C_t-1)^(-gamma) * \Omega</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  sdf <span class="ot">&lt;-</span> beta <span class="sc">*</span> (consumption_growth<span class="sc">^</span>(<span class="sc">-</span>gamma)) <span class="sc">*</span> omega</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute residuals for the moment conditions</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  residuals <span class="ot">&lt;-</span> sdf <span class="sc">*</span> returns <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return the sum of squared residuals</span></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(residuals<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial parameters: beta, gamma, and coefficients for \Omega</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>init_params <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.99</span>, <span class="dv">10</span>, <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">ncol</span>(basis_tensor)))</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimization for SMD estimation</span></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>optim_result <span class="ot">&lt;-</span> <span class="fu">optim</span>(</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">par =</span> init_params,</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn =</span> smd_objective,</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">basis_tensor =</span> basis_tensor,</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>  <span class="at">returns =</span> data<span class="sc">$</span>returns,</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>  <span class="at">consumption_growth =</span> data<span class="sc">$</span>consumption_growth,</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">leverage =</span> data<span class="sc">$</span>phi_t,</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">net_worth =</span> data<span class="sc">$</span>psi_t,</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"BFGS"</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract estimated parameters</span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="ot">&lt;-</span> optim_result<span class="sc">$</span>par[<span class="dv">1</span>]</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>gamma_hat <span class="ot">&lt;-</span> optim_result<span class="sc">$</span>par[<span class="dv">2</span>]</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>omega_hat <span class="ot">&lt;-</span> optim_result<span class="sc">$</span>par[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)]</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a><span class="do">## Step 2: GMM Estimation of Preference Parameters \beta and \gamma</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute \Omega from the estimated parameters</span></span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>omega_estimated <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(basis_tensor <span class="sc">%*%</span> omega_hat)</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a><span class="co"># Define instruments (conditioning variables)</span></span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>compute_instruments <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>  wt <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">cay_t =</span> <span class="fu">scale</span>(data<span class="sc">$</span>cay_t),</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">RREL_t =</span> <span class="fu">scale</span>(data<span class="sc">$</span>RREL_t),</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">SPEX_t =</span> <span class="fu">scale</span>(data<span class="sc">$</span>SPEX_t),</span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">consumption_growth =</span> <span class="fu">scale</span>(data<span class="sc">$</span>consumption_growth),</span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">leverage_t =</span> <span class="fu">scale</span>(data<span class="sc">$</span>phi_t)</span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">as.matrix</span>(wt))</span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a>instruments <span class="ot">&lt;-</span> <span class="fu">compute_instruments</span>(data)</span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the GMM objective function</span></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>gmm_objective <span class="ot">&lt;-</span> <span class="cf">function</span>(params, returns, omega_estimated, instruments) {</span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> params[<span class="dv">1</span>]</span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> params[<span class="dv">2</span>]</span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute the SDF m_t</span></span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>  sdf <span class="ot">&lt;-</span> beta <span class="sc">*</span> (data<span class="sc">$</span>consumption_growth<span class="sc">^</span>(<span class="sc">-</span>gamma)) <span class="sc">*</span> omega_estimated</span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Moment conditions</span></span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>  residuals <span class="ot">&lt;-</span> sdf <span class="sc">*</span> returns <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>  moments <span class="ot">&lt;-</span> <span class="fu">t</span>(instruments) <span class="sc">%*%</span> residuals <span class="sc">/</span> <span class="fu">nrow</span>(instruments)</span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return the quadratic form of moments</span></span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(moments<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial parameters for GMM</span></span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a>init_gmm_params <span class="ot">&lt;-</span> <span class="fu">c</span>(beta_hat, gamma_hat)</span>
+<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a><span class="co"># GMM optimization</span></span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a>gmm_result <span class="ot">&lt;-</span> <span class="fu">optim</span>(</span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a>  <span class="at">par =</span> init_gmm_params,</span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn =</span> gmm_objective,</span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a>  <span class="at">returns =</span> data<span class="sc">$</span>returns,</span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_estimated =</span> omega_estimated,</span>
+<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a>  <span class="at">instruments =</span> instruments,</span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"BFGS"</span></span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract GMM-estimated preference parameters</span></span>
+<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a>beta_gmm <span class="ot">&lt;-</span> gmm_result<span class="sc">$</span>par[<span class="dv">1</span>]</span>
+<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a>gamma_gmm <span class="ot">&lt;-</span> gmm_result<span class="sc">$</span>par[<span class="dv">2</span>]</span>
+<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a><span class="do">## Step 3: Compute Risk Prices Using Linear Model</span></span>
+<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute \beta_j,c and \beta_j,\Omega for each asset</span></span>
+<span id="cb12-125"><a href="#cb12-125" aria-hidden="true" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">split</span>(data, data<span class="sc">$</span>asset_id), <span class="cf">function</span>(asset_data) {</span>
+<span id="cb12-126"><a href="#cb12-126" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(returns <span class="sc">~</span> consumption_growth <span class="sc">+</span> <span class="fu">log</span>(omega_estimated), <span class="at">data =</span> asset_data)</span>
+<span id="cb12-127"><a href="#cb12-127" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">coef</span>(fit))</span>
+<span id="cb12-128"><a href="#cb12-128" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-129"><a href="#cb12-129" aria-hidden="true" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, betas)</span>
+<span id="cb12-130"><a href="#cb12-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-131"><a href="#cb12-131" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross-sectional regression for risk prices</span></span>
+<span id="cb12-132"><a href="#cb12-132" aria-hidden="true" tabindex="-1"></a>cross_sectional_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(avg_excess_return <span class="sc">~</span> betas[, <span class="st">"consumption_growth"</span>] <span class="sc">+</span> betas[, <span class="st">"log(omega_estimated)"</span>], <span class="at">data =</span> data)</span>
+<span id="cb12-133"><a href="#cb12-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-134"><a href="#cb12-134" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract risk prices</span></span>
+<span id="cb12-135"><a href="#cb12-135" aria-hidden="true" tabindex="-1"></a>lambda_c <span class="ot">&lt;-</span> <span class="fu">coef</span>(cross_sectional_fit)[<span class="st">"betas[, </span><span class="sc">\"</span><span class="st">consumption_growth</span><span class="sc">\"</span><span class="st">]"</span>]</span>
+<span id="cb12-136"><a href="#cb12-136" aria-hidden="true" tabindex="-1"></a>lambda_omega <span class="ot">&lt;-</span> <span class="fu">coef</span>(cross_sectional_fit)[<span class="st">"betas[, </span><span class="sc">\"</span><span class="st">log(omega_estimated)</span><span class="sc">\"</span><span class="st">]"</span>]</span>
+<span id="cb12-137"><a href="#cb12-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-138"><a href="#cb12-138" aria-hidden="true" tabindex="-1"></a><span class="do">## Results</span></span>
+<span id="cb12-139"><a href="#cb12-139" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Estimated beta (GMM):"</span>, beta_gmm, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-140"><a href="#cb12-140" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Estimated gamma (GMM):"</span>, gamma_gmm, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-141"><a href="#cb12-141" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Risk price of consumption growth (lambda_c):"</span>, lambda_c, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-142"><a href="#cb12-142" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Risk price of omega (lambda_omega):"</span>, lambda_omega, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>
